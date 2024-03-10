@@ -14,12 +14,16 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 class EntropyCollector {
-
     constructor(intEntropyAmount, updateCallback,finalCallback) {
         this.intEntropyAmount = intEntropyAmount;
         this.updateCallback = updateCallback;
         this.finalCallback = finalCallback;
         this.pool = [];
+        this.interval = 20;
+        this.count = 0;
+    }
+
+    run() {
         this.interval = 20;
         this.count = 0;
         this.eventCallback = (event) => {
@@ -38,8 +42,7 @@ class EntropyCollector {
 
         const lastPosition = this.pool[this.pool.length - 1];
         if (!lastPosition || lastPosition[0] !== x && lastPosition[1] !== y) {
-            this.pool.push(x);
-            this.pool.push(y);
+            this.pool.push(x * y);
 
             this.updateCallback(this.pool.length, this.intEntropyAmount);
 
@@ -53,7 +56,24 @@ class EntropyCollector {
 
     reset() {
         this.pool = [];
+        this.count = 0;
     }
 
 }
 
+/**
+ *
+ * Example usage code:
+
+ var entropyAmount = 42;
+var updateCallback = function(poolLength, desiredAmount) {
+    console.log("We are at " + poolLength + " of " + desiredAmount + " datasets");
+};
+var finalCallback = function(pool) {
+    console.log("The reached the desired amount of datasets: ", pool);
+    console.log(JSON.stringify(pool));
+};
+var ec = new EntropyCollector(entropyAmount, updateCallback, finalCallback);
+ec.run();
+
+ **/
